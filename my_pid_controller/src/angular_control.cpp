@@ -2,33 +2,32 @@
 #include "std_msgs/Int32.h"
 #include "std_msgs/Float64.h"
 #include "geometry_msgs/Twist.h"
+#include <iostream>
 
 class AngularController {
 public:
-    AngularController() : nh_(), kp_(5.5), ki_(0.1), kd_(0.1), goal_angle_(0.0), current_angle_(0.0), integral_(0.0), prev_error_(0.0) {
+    AngularController() 
+        : nh_(), goal_angle_(0.0), current_angle_(0.0), 
+          Kp_(8.0), Ki_(0.05), Kd_(0.03), prev_error_(0.0), integral_(0.0) {
         potentiometer_sub_ = nh_.subscribe("/potentiometer", 10, &AngularController::potentiometerCallback, this);
         goal_angle_sub_ = nh_.subscribe("/goal_angle", 10, &AngularController::goalAngleCallback, this);
         angular_pub_ = nh_.advertise<geometry_msgs::Twist>("/cmd_vel", 10);
-        last_time_ = ros::Time::now();
     }
 
     void controlLoop() {
         ros::Rate rate(15); // 15 Hz
+
         while (ros::ok()) {
-            ros::Time current_time = ros::Time::now();
-            double dt = (current_time - last_time_).toSec();
-
             double error = goal_angle_ - current_angle_;
-            integral_ += error * dt;
-            double derivative = (error - prev_error_) / dt;
+            integral_ += error;
+            double derivative = error - prev_error_;
+            double output = Kp_ * error + Ki_ * integral_ + Kd_ * derivative ;
 
-            double output = kp_ * error + ki_ * integral_ + kd_ * derivative;
             geometry_msgs::Twist twist_msg;
             twist_msg.angular.z = output;
             angular_pub_.publish(twist_msg);
 
             prev_error_ = error;
-            last_time_ = current_time;
 
             ros::spinOnce();
             rate.sleep();
@@ -48,8 +47,8 @@ private:
     void goalAngleCallback(const std_msgs::Float64::ConstPtr& msg) {
         double angle = msg->data;
         // Goal angle을 -18도에서 18도 범위로 제한
-        if (angle < -18.0) angle = -18.0;
-        if (angle > 18.0) angle = 18.0;
+        if (angle < -15.0) angle = -15.0;
+        if (angle > 15.0) angle = 15.0;
         goal_angle_ = angle;
         ROS_INFO("Goal Angle: %f", goal_angle_);
     }
@@ -60,10 +59,12 @@ private:
     ros::Publisher angular_pub_;
 
     int potentiometer_;
-    double kp_, ki_, kd_;
     double goal_angle_, current_angle_;
-    double integral_, prev_error_;
-    ros::Time last_time_;
+
+    // PID control variables
+    double Kp_, Ki_, Kd_;
+    double prev_error_;
+    double integral_;
 };
 
 int main(int argc, char** argv) {

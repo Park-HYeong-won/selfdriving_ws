@@ -6,7 +6,7 @@
     <node pkg="my_pid_controller" type="pid_controller" name="pid_controller" output="screen"/>
     
     <node pkg="my_pid_controller" type="angular_control" name="angular_control" output="screen"/>
-    <node pkg="my_pid_controller" type="goal_velocity_publisher" name="goal_velocity_publisher" output="screen"/>	
+    <!--<node pkg="my_pid_controller" type="goal_velocity_publisher" name="goal_velocity_publisher" output="screen"/> -->	
 
     <!-- rosserial_python의 serial_node.py 실행 -->
     <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen">

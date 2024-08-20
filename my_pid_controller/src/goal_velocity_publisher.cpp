@@ -3,45 +3,39 @@
 #include "geometry_msgs/Twist.h"
 #include <iostream>
 
-double input_angle;
+double input_linear;
+double current_velocity_ = 0.0;
 
-// 콜백 함수 정의
-void pushAngleCallback(const geometry_msgs::Twist::ConstPtr& msg)
-{
-    input_angle = msg->angular.z;
-    // 여기서 메시지를 처리하는 코드를 추가할 수 있습니다.
+void velocityCallback(const std_msgs::Float64::ConstPtr& msg) {
+    current_velocity_ = msg->data;
+    ROS_INFO("Current velocity: %f", current_velocity_);
 }
 
 int main(int argc, char** argv) {
+    std::cout << "cmd_vel : ";
+    std::cin >> input_linear;
+
     ros::init(argc, argv, "goal_velocity_publisher");
     ros::NodeHandle nh;
 
+    // Subscriber 정의
+    ros::Subscriber velocity_sub = nh.subscribe("/current_velocity", 10, velocityCallback);
+    
     // Publisher 정의
     ros::Publisher goal_angle_pub = nh.advertise<std_msgs::Float64>("/goal_angle", 10);
     ros::Publisher goal_velocity_pub = nh.advertise<std_msgs::Float64>("/goal_velocity", 10);
-    
-    // Subscriber 정의
-    ros::Subscriber push_angle_sub = nh.subscribe("/push_angle", 10, pushAngleCallback);
+    ros::Publisher velocity_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 10);
 
     ros::Rate rate(1); // 1 Hz
 
     while (ros::ok()) {
-        std_msgs::Float64 angle_msg;
-        std_msgs::Float64 velocity_msg;
+        geometry_msgs::Twist twist_msg;
 
-        // 입력값을 -15도에서 15도 범위로 제한
-        if (input_angle < -15.0) {
-            input_angle = -15.0;
-        } else if (input_angle > 15.0) {
-            input_angle = 15.0;
-        }
+        // Twist 메시지에 입력된 속도를 설정
+        twist_msg.linear.x = input_linear;
+        velocity_pub.publish(twist_msg);
 
-        angle_msg.data = input_angle;
-        velocity_msg.data = 1.0;
-        goal_angle_pub.publish(angle_msg);
-        goal_velocity_pub.publish(velocity_msg);
-        
-        ROS_INFO("Published goal angle: %f", input_angle);
+        ROS_INFO("Input cmd_vel: %f", input_linear);
 
         ros::spinOnce(); // 콜백 함수 호출을 위해 spinOnce() 사용
         rate.sleep();
@@ -50,11 +44,7 @@ int main(int argc, char** argv) {
     // 노드가 종료되기 전에 속도와 각도를 0으로 설정
     std_msgs::Float64 zero_msg;
     zero_msg.data = 0.0;
-    goal_angle_pub.publish(zero_msg);
-    goal_velocity_pub.publish(zero_msg);
-    
-    ROS_INFO("Published goal angle: 0.0");
-    ROS_INFO("Published goal velocity: 0.0");
+    velocity_pub.publish(zero_msg);
 
     return 0;
 }
