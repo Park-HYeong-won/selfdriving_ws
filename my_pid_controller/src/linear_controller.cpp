@@ -1,12 +1,11 @@
 #include "ros/ros.h"
 #include "std_msgs/Float64.h"
-#include "std_msgs/Int32.h"
 #include "geometry_msgs/Twist.h"
 
 class PIDController {
 public:
     PIDController()
-        : nh_("~"), kp_(7.0), ki_(15.0), kd_(0.05), prev_error_(0.0), integral_(0.0), goal_velocity_(0.0), current_velocity_(0.0) {
+        : nh_("~"), kp_(7.0), ki_(0.05), kd_(0.05), prev_error_(0.0), integral_(0.0), goal_velocity_(0.0), current_velocity_(0.0), force_(0.0) {
 
         nh_.param("kp", kp_, kp_);
         nh_.param("ki", ki_, ki_);
@@ -29,7 +28,7 @@ public:
             integral_ += error * dt;
             double derivative = (error - prev_error_) / dt;
       
-            double output = kp_ * error + ki_ * integral_ + kd_ * derivative;
+            double output = kp_ * error + ki_ * integral_ + kd_ * derivative + force_;
            
             geometry_msgs::Twist twist_msg;
             twist_msg.linear.x = output;
@@ -46,14 +45,32 @@ public:
 private:
     void goalVelocityCallback(const std_msgs::Float64::ConstPtr& msg) {
         goal_velocity_ = msg->data;
+        switch (static_cast<int>(goal_velocity_)) {
+        case 1:
+            force_ = 30;
+            break;
+        case 2:
+            force_ = 36;
+            break;
+        case 3:
+            force_ = 40;
+            break;
+        case 4:
+            force_ = 44;
+            break;
+        case 5:
+            force_ = 48;
+            break;
+        default:
+            force_ = 0;
+            break;
+        }
     }
 
     void velocityCallback(const std_msgs::Float64::ConstPtr& msg) {
         current_velocity_ = msg->data;
         ROS_INFO("current velocity: %f", current_velocity_);
     }
-
-    
 
     ros::NodeHandle nh_;
     ros::Subscriber goal_velocity_sub_;
@@ -63,6 +80,7 @@ private:
     double kp_, ki_, kd_;
     double goal_velocity_, current_velocity_;
     double prev_error_, integral_;
+    double force_;
     ros::Time last_time_;
 };
 
