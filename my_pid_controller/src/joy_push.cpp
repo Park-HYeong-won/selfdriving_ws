@@ -16,6 +16,7 @@ private:
 
     double linear_;
     double angular_;
+    int auto_move_active;
 };
 
 JoyPush::JoyPush() :
@@ -35,8 +36,18 @@ void JoyPush::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
     // 오른쪽 조이스틱 (축 3: 좌/우)으로 각속도를 조절
     twist.angular.z = angular_ * joy->axes[3];
+    
+    if(joy->buttons[6] != 0) {
+        auto_move_active = 0;
+    }
+    if(joy->buttons[7] != 0){
+        auto_move_active = 1;
+    }
+   
 
+    if(auto_move_active == 1){
     vel_pub_.publish(twist);
+    }
 }
 
 int main(int argc, char** argv)
