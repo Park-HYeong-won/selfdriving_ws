@@ -3,7 +3,7 @@
     <node pkg="my_pid_controller" type="speed_calculator" name="speed_calculator_node" output="screen"/>
 
     <!-- pid_controller 노드 실행 -->
-    <node pkg="my_pid_controller" type="pid_controller" name="pid_controller" output="screen"/>
+    <node pkg="my_pid_controller" type="linear_controller" name="linear_controller" output="screen"/>
     
     <node pkg="my_pid_controller" type="angular_control" name="angular_control" output="screen"/>
     <!--<node pkg="my_pid_controller" type="goal_velocity_publisher" name="goal_velocity_publisher" output="screen"/> -->	
