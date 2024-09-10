@@ -45,24 +45,24 @@ public:
 private:
     void goalVelocityCallback(const std_msgs::Float64::ConstPtr& msg) {
         goal_velocity_ = msg->data;
-        switch (static_cast<int>(goal_velocity_)) {
-        case 1:
-            force_ = 30;
+        switch (goal_velocity_) {
+        case 1.0:
+            force_ = 30.0;
             break;
-        case 2:
-            force_ = 36;
+        case 2.0:
+            force_ = 36.0;
             break;
-        case 3:
-            force_ = 40;
+        case 3.0:
+            force_ = 40.0;
             break;
-        case 4:
-            force_ = 44;
+        case 4.0:
+            force_ = 44.0;
             break;
-        case 5:
-            force_ = 48;
+        case 5.0:
+            force_ = 48.0;
             break;
         default:
-            force_ = 0;
+            force_ = 0.0;
             break;
         }
     }
