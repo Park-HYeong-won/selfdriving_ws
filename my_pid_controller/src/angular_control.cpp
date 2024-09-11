@@ -11,7 +11,7 @@ public:
           Kp_(8.0), Ki_(0.05), Kd_(0.03), prev_error_(0.0), integral_(0.0) {
         potentiometer_sub_ = nh_.subscribe("/potentiometer", 10, &AngularController::potentiometerCallback, this);
         goal_angle_sub_ = nh_.subscribe("/goal_angle", 10, &AngularController::goalAngleCallback, this);
-        angular_pub_ = nh_.advertise<geometry_msgs::Twist>("/cmd_vel", 10);
+        angular_pub_ = nh_.advertise<std_msgs::Float64>("/angular_output", 10);
     }
 
     void controlLoop() {
@@ -23,9 +23,9 @@ public:
             double derivative = error - prev_error_;
             double output = Kp_ * error + Ki_ * integral_ + Kd_ * derivative ;
 
-            geometry_msgs::Twist twist_msg;
-            twist_msg.angular.z = output;
-            angular_pub_.publish(twist_msg);
+            std_msgs::Float64 angular_msg;
+            angular_msg.data = output;
+            angular_pub_.publish(angular_msg);
 
             prev_error_ = error;
 

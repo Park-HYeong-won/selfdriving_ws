@@ -14,7 +14,7 @@ public:
         goal_velocity_sub_ = nh_.subscribe("/goal_velocity", 10, &PIDController::goalVelocityCallback, this);
         velocity_sub_ = nh_.subscribe("/current_velocity", 10, &PIDController::velocityCallback, this);
 
-        velocity_pub_ = nh_.advertise<geometry_msgs::Twist>("/cmd_vel", 10);
+        velocity_pub_ = nh_.advertise<std_msgs::Float64>("/linear_output", 10);
         last_time_ = ros::Time::now();
     }
 
@@ -30,9 +30,9 @@ public:
       
             double output = kp_ * error + ki_ * integral_ + kd_ * derivative + force_;
            
-            geometry_msgs::Twist twist_msg;
-            twist_msg.linear.x = output;
-            velocity_pub_.publish(twist_msg);
+            std_msgs::Float64 velocity_msg;
+            velocity_msg.data = output;
+            velocity_pub_.publish(velocity_msg);
 
             prev_error_ = error;
             last_time_ = current_time;
