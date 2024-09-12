@@ -7,7 +7,7 @@ public:
     CMDController(){
         // 구독자 설정
         input_velocity_sub_ = nh_.subscribe("/linear_output", 10, &CMDController::InputVelocityCallback, this);
-        input_angular_sub_ = nh_.subscribe("/current_velocity", 10, &CMDController::InputAngularCallback, this);
+        input_angular_sub_ = nh_.subscribe("/angular_output", 10, &CMDController::InputAngularCallback, this);
 
         // 퍼블리셔 설정
         robot_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 10);
