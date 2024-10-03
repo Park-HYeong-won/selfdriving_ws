@@ -28,6 +28,7 @@ std::vector<Waypoint> waypoints;
 int current_waypoint_idx = 0;
 Waypoint current_position;
 Waypoint previous_position;
+Waypoint previous_position2;
 bool first_gps_received = false;
 
 // Waypoints 파일 읽기 함수
@@ -129,7 +130,7 @@ int main(int argc, char **argv) {
                 }
             }
 
-            double current_heading = calculateCurrentHeading(previous_position, current_position);
+            double current_heading = calculateCurrentHeading(previous_position2, current_position);
             double target_heading = calculateTargetHeading(current_position, waypoints[current_waypoint_idx]);
 
             double heading_error = target_heading - current_heading;
@@ -159,7 +160,7 @@ int main(int argc, char **argv) {
             std_msgs::Float64 speed_msg;
             speed_msg.data = 1.0;  // 임의의 목표 속도
             speed_pub.publish(speed_msg);
-
+            previous_position2 = previous_position;
             previous_position = current_position;
         }
 
