@@ -20,8 +20,8 @@ private:
 };
 
 JoyPush::JoyPush() :
-    linear_(36),
-    angular_(40)
+    linear_(50),
+    angular_(50)
 {
     vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
     joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &JoyPush::joyCallback, this);
