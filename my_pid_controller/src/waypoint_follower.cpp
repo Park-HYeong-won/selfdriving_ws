@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
     ros::Publisher heading_pub = nh.advertise<std_msgs::Float64>("goal_angle", 10);
     ros::Publisher speed_pub = nh.advertise<std_msgs::Float64>("goal_velocity", 10);
 
-    ros::Subscriber gps_sub = nh.subscribe("ublox_fix", 10, gpsCallback);
+    ros::Subscriber gps_sub = nh.subscribe("ublox_gps/fix", 10, gpsCallback);
 
     ros::Rate rate(10);
 
